@@ -26,4 +26,10 @@ public class ProdutoController {
     public ProdutoModel adicionarProduto(@RequestBody ProdutoModel produtoModel) {
         return produtoService.salvar(produtoModel);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarProduto(Integer id) {
+        produtoService.deletarProduto(id);
+    }
 }

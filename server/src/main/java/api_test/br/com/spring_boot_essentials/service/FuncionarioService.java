@@ -15,10 +15,21 @@ public class FuncionarioService {
         return funcionarioRepository.save(funcionario);
     }
 
+    public FuncionarioModel listarFuncionario(FuncionarioModel funcionario){
+        return funcionarioRepository.findById(funcionario.getId()).get();
+    }
+
     public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario){
 
         FuncionarioModel existente = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> new RuntimeException("Funcionario não existe"));
 
         return funcionarioRepository.save(funcionario);
+    }
+
+    public void deletarFuncionario(Integer id){
+
+        FuncionarioModel excluir = funcionarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Funcionario não existe"));
+
+        funcionarioRepository.deleteById(id);
     }
 }

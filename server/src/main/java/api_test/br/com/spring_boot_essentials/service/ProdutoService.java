@@ -17,6 +17,10 @@ public class ProdutoService {
         return produtoRepository.save(produtoModel);
     }
 
+    public void deletarProduto(Integer id){
+        produtoRepository.deleteById(id);
+    }
+
     public List<ProdutoModel> listar() {
         return produtoRepository.findAll();
     }
