@@ -14,4 +14,11 @@ public class FuncionarioService {
     public FuncionarioModel cadastrarFuncionario(FuncionarioModel funcionario){
         return funcionarioRepository.save(funcionario);
     }
+
+    public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario){
+
+        FuncionarioModel existente = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> new RuntimeException("Funcionario não existe"));
+
+        return funcionarioRepository.save(funcionario);
+    }
 }
