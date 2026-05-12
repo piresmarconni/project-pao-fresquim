@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.service;
 
+import api_test.br.com.spring_boot_essentials.exception.RegraNegocioException;
 import api_test.br.com.spring_boot_essentials.model.ProdutoModel;
 import api_test.br.com.spring_boot_essentials.model.VendaModel;
 import api_test.br.com.spring_boot_essentials.repository.VendaRepository;
@@ -18,6 +19,10 @@ public class VendaService {
 
         List<ProdutoModel> produtos = vendaModel.getProdutos();
 
+        if(produtos == null || produtos.isEmpty()) {
+            throw new RegraNegocioException("A venda deve conter pelo menos um produto.");
+        }
+
         double valorTotal = 0;
 
         if(produtos != null) {
@@ -31,6 +36,12 @@ public class VendaService {
     }
 
     public String emitirNotaFiscal(VendaModel vendaModel) {
+
+        List<ProdutoModel> produtos = vendaModel.getProdutos();
+
+        if(produtos == null || produtos.isEmpty()) {
+            throw new RegraNegocioException("Não é possível emitir nota fiscal para venda sem produtos.");
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("NOTA FISCAL\n");

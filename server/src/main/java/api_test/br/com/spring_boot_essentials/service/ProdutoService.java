@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.service;
 
+import api_test.br.com.spring_boot_essentials.exception.RecursoNaoEncontradoException;
 import api_test.br.com.spring_boot_essentials.model.ProdutoModel;
 import api_test.br.com.spring_boot_essentials.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ProdutoService {
     }
 
     public void deletarProduto(Integer id){
+        ProdutoModel produto = produtoRepository.findById(id).orElseThrow(() -> 
+            new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
+        
         produtoRepository.deleteById(id);
     }
 
