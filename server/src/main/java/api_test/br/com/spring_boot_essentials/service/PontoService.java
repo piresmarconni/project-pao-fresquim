@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.service;
 
+import api_test.br.com.spring_boot_essentials.exception.RecursoNaoEncontradoException;
 import api_test.br.com.spring_boot_essentials.model.FuncionarioModel;
 import api_test.br.com.spring_boot_essentials.model.PontoModel;
 import api_test.br.com.spring_boot_essentials.repository.FuncionarioRepository;
@@ -22,7 +23,10 @@ public class PontoService {
 
     public PontoModel registrarEntrada(Integer idFuncionario){
 
-        FuncionarioModel funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() -> new RuntimeException("Funcionario não encontrado!"));
+        FuncionarioModel funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
+                new RecursoNaoEncontradoException(
+                        "Funcionário não encontrado com ID: " + idFuncionario
+                ));
 
         PontoModel ponto = new PontoModel();
         ponto.setFuncionario(funcionario);
@@ -35,7 +39,10 @@ public class PontoService {
 
     public PontoModel registarSaida(Integer pontoId){
 
-        PontoModel ponto = pontoRepository.findById(pontoId).orElseThrow(() -> new RuntimeException("Registro de ponto não encontrado!"));
+        PontoModel ponto = pontoRepository.findById(pontoId).orElseThrow(() ->
+                new RecursoNaoEncontradoException(
+                        "Registro de ponto não encontrado com ID: " + pontoId
+                ));
 
         ponto.setHoraSaida(LocalTime.now());
 

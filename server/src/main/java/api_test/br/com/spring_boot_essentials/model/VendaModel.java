@@ -1,6 +1,8 @@
 package api_test.br.com.spring_boot_essentials.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,10 @@ public class VendaModel {
     private Integer id;
 
     @Column(nullable = false)
+    @NotNull(message = "Data da venda é obrigatória")
+    @PastOrPresent(message = "Data da venda não pode ser futura")
     private LocalDate dataVenda;
+    
     private Double valorTotal;
 
     @ManyToMany

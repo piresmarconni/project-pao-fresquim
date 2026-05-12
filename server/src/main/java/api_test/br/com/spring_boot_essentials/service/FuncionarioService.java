@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.service;
 
+import api_test.br.com.spring_boot_essentials.exception.RecursoNaoEncontradoException;
 import api_test.br.com.spring_boot_essentials.model.FuncionarioModel;
 import api_test.br.com.spring_boot_essentials.repository.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,16 @@ public class FuncionarioService {
 
     public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario){
 
-        FuncionarioModel existente = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> new RuntimeException("Funcionario não existe"));
+        FuncionarioModel existente = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> 
+            new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionario.getId()));
 
         return funcionarioRepository.save(funcionario);
     }
 
     public void deletarFuncionario(Integer id){
 
-        FuncionarioModel excluir = funcionarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Funcionario não existe"));
+        FuncionarioModel excluir = funcionarioRepository.findById(id).orElseThrow(() -> 
+            new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + id));
 
         funcionarioRepository.deleteById(id);
     }

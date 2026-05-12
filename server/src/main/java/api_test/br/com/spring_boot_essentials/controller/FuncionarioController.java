@@ -2,6 +2,7 @@ package api_test.br.com.spring_boot_essentials.controller;
 
 import api_test.br.com.spring_boot_essentials.model.FuncionarioModel;
 import api_test.br.com.spring_boot_essentials.service.FuncionarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,13 @@ public class FuncionarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FuncionarioModel cadastrarFuncionario(FuncionarioModel funcionario){
+    public FuncionarioModel cadastrarFuncionario(@Valid FuncionarioModel funcionario){
         return funcionarioService.cadastrarFuncionario(funcionario);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario){
+    public FuncionarioModel atualizarFuncionario(@Valid FuncionarioModel funcionario){
         return funcionarioService.atualizarFuncionario(funcionario);
     }
 

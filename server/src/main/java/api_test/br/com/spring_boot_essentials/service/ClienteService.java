@@ -1,6 +1,7 @@
 package api_test.br.com.spring_boot_essentials.service;
 
 
+import api_test.br.com.spring_boot_essentials.exception.RecursoNaoEncontradoException;
 import api_test.br.com.spring_boot_essentials.model.ClienteModel;
 import api_test.br.com.spring_boot_essentials.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,10 @@ public class ClienteService {
 
     public boolean validarSerasa(Integer clienteId){
 
-        ClienteModel cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new RuntimeException("Cliente não encontrado!"));
+        ClienteModel cliente = clienteRepository.findById(clienteId).orElseThrow(() ->
+                new RecursoNaoEncontradoException(
+                        "Cliente não encontrado com ID: " + clienteId
+                ));
 
         boolean checarCliente = checarClienteSerasa(cliente.getCpf());
 

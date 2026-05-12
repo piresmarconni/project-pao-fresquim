@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.service;
 
+import api_test.br.com.spring_boot_essentials.exception.RegraNegocioException;
 import api_test.br.com.spring_boot_essentials.model.ClienteModel;
 import api_test.br.com.spring_boot_essentials.model.FuncionarioModel;
 import api_test.br.com.spring_boot_essentials.model.ProdutoModel;
@@ -27,7 +28,7 @@ public class SistemaService {
     public ProdutoModel cadastarProduto(ProdutoModel produtoModel) {
 
         if(produtoModel.getPreco() <= 0) {
-            System.out.println("Preço invalido para cadastrar");
+            throw new RegraNegocioException("Preço do produto deve ser maior que zero.");
         }
 
         return produtoService.salvar(produtoModel);

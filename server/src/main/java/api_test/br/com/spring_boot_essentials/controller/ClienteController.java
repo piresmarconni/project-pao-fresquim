@@ -2,6 +2,7 @@ package api_test.br.com.spring_boot_essentials.controller;
 
 import api_test.br.com.spring_boot_essentials.model.ClienteModel;
 import api_test.br.com.spring_boot_essentials.service.ClienteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClienteModel salvar(@RequestBody ClienteModel clienteModel) {
+    public ClienteModel salvar(@Valid @RequestBody ClienteModel clienteModel) {
         return clienteService.cadastrarCliente(clienteModel);
     }
 
