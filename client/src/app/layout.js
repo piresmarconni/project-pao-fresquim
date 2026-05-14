@@ -1,5 +1,7 @@
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+// 1. Importe o Toaster
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "Padaria System - Gestão de Vendas",
@@ -13,7 +15,31 @@ export default function RootLayout({ children }) {
         <div className="flex">
           <Sidebar />
 
-          <main className="flex-1 ml-64 min-h-screen">{children}</main>
+          <main className="flex-1 ml-64 min-h-screen">
+            {children}
+
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: "#fff",
+                  color: "#374151",
+                  fontWeight: "bold",
+                },
+                success: {
+                  style: {
+                    border: "1px solid #a7f3d0",
+                  },
+                },
+                error: {
+                  style: {
+                    border: "1px solid #fecaca",
+                  },
+                },
+              }}
+            />
+          </main>
         </div>
       </body>
     </html>

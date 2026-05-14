@@ -1,122 +1,188 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit2, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import api from "../../../services/api";
+import ModalProduto from "@/components/ModalProduto";
+import toast from "react-hot-toast";
 
 export default function ProdutosPage() {
-  const [produtos, setProdutos] = useState([]);
   const [busca, setBusca] = useState("");
+  const [produtos, setProdutos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Estado de loading
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    produtoEditando: null,
+  });
+
+  async function getProdutos(params) {
+    setIsLoading(true);
+    try {
+      const response = await api.get("/produtos", { params });
+      setProdutos(response.data);
+    } catch (error) {
+      toast.error("Erro ao buscar produtos.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const dadosProdutos = [
-      {
-        id: 1,
-        nome: "Pão Francês",
-        categoria: "Pães",
-        custo: 0.25,
-        preco: 0.5,
-        estoque: 200,
-      },
-    ];
-    setProdutos(dadosProdutos);
+    getProdutos();
   }, []);
 
-  // Filtro de busca por nome ou categoria
+  async function deleteProduto(id) {
+    try {
+      await api.delete(`/produtos/${id}`);
+      await getProdutos();
+    } catch (error) {
+      console.error("Erro ao excluir produto:", error);
+      alert("Erro ao excluir produto.");
+    }
+  }
+
+  const handleSaveProduto = async (dadosDoFormulario) => {
+    try {
+      if (dadosDoFormulario.id) {
+        await api.put(`/produtos/${dadosDoFormulario.id}`, dadosDoFormulario);
+        toast.success("Produto atualizado com sucesso!");
+      } else {
+        await api.post("/produtos", dadosDoFormulario);
+        toast.success("Produto criado com sucesso!");
+      }
+
+      setModalConfig({ isOpen: false, produtoEditando: null });
+      await getProdutos();
+    } catch (error) {
+      console.error("Erro ao salvar produto:", error);
+      alert("Ocorreu um erro ao conectar com o servidor.");
+    }
+  };
+
+  const termoBusca = busca?.toLowerCase() || "";
   const produtosFiltrados = produtos.filter(
     (p) =>
-      p.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      p.categoria.toLowerCase().includes(busca.toLowerCase()),
+      p.nome?.toLowerCase().includes(termoBusca) ||
+      p.categoria?.toLowerCase().includes(termoBusca),
   );
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Produtos</h1>
-          <p className="text-gray-500">Gerencie o catálogo de produtos</p>
+          <p className="text-gray-500">Gerencie o catálogo da padaria</p>
         </div>
-        <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium shadow-sm">
+        <button
+          onClick={() =>
+            setModalConfig({ isOpen: true, produtoEditando: null })
+          }
+          className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-100"
+        >
           <Plus size={20} />
           Novo Produto
         </button>
       </div>
 
-      {/* Contaiter que lista os produtos */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Barra de Pesquisa */}
-        <div className="p-6 border-b border-gray-50">
-          <div className="relative max-w-full">
+        <div className="p-4 border-b border-gray-50">
+          <div className="relative">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               size={18}
             />
             <input
               type="text"
-              placeholder="Buscar produtos..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm transition-all"
+              placeholder="Buscar produto pelo nome ou categoria..."
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50/50">
-              <tr className="text-gray-400 text-[11px] uppercase tracking-wider font-semibold">
-                <th className="px-6 py-4">Produto</th>
-                <th className="px-6 py-4">Categoria</th>
-                <th className="px-6 py-4">Custo</th>
-                <th className="px-6 py-4">Preço</th>
-                <th className="px-6 py-4">Estoque</th>
-                <th className="px-6 py-4 text-right">Ações</th>
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 text-[11px] uppercase text-gray-400 font-bold">
+            <tr>
+              <th className="px-6 py-4">Produto</th>
+              <th className="px-6 py-4">Categoria</th>
+              <th className="px-6 py-4">Preço</th>
+              <th className="px-6 py-4 text-center">Estoque</th>
+              <th className="px-6 py-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {isLoading ? (
+              <tr>
+                <td colSpan="5" className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center text-orange-500">
+                    <Loader2 size={32} className="animate-spin mb-2" />
+                    <p className="text-gray-500 font-medium text-sm">
+                      Carregando produtos...
+                    </p>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50 text-sm">
-              {produtosFiltrados.map((item) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-50/50 transition-colors"
+            ) : produtosFiltrados.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="px-6 py-12 text-center text-gray-500"
                 >
-                  <td className="px-6 py-4 font-bold text-gray-800">
-                    {item.nome}
+                  Nenhum produto encontrado.
+                </td>
+              </tr>
+            ) : (
+              produtosFiltrados.map((prod) => (
+                <tr
+                  key={prod.id}
+                  className="hover:bg-gray-50/50 transition-colors group"
+                >
+                  <td className="px-6 py-4 font-bold text-gray-700">
+                    {prod.nome}
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-lg text-xs font-medium">
-                      {item.categoria}
-                    </span>
+                  <td className="px-6 py-4 text-gray-500 text-sm">
+                    {prod.categoria}
                   </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    R${" "}
-                    {item.custo.toLocaleString("pt-BR", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td className="px-6 py-4 font-bold text-gray-800">
-                    R${" "}
-                    {item.preco.toLocaleString("pt-BR", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600 font-medium">
-                    {item.estoque}
+                  <td className="px-6 py-4 font-bold">R$ {prod.preco}</td>
+                  <td className="px-6 py-4 text-center font-medium text-gray-600">
+                    {prod.estoque}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors border border-blue-100">
-                        <Edit2 size={16} />
+                      <button
+                        onClick={() =>
+                          setModalConfig({
+                            isOpen: true,
+                            produtoEditando: prod,
+                          })
+                        }
+                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        <Pencil size={20} />
                       </button>
-                      <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-red-100">
-                        <Trash2 size={16} />
+                      <button
+                        onClick={() => deleteProduto(prod.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={20} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      <ModalProduto
+        isOpen={modalConfig.isOpen}
+        produtoEditando={modalConfig.produtoEditando}
+        onClose={() => setModalConfig({ isOpen: false, produtoEditando: null })}
+        onSave={handleSaveProduto}
+      />
     </div>
   );
 }
