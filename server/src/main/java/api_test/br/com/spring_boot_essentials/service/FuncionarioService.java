@@ -12,27 +12,37 @@ public class FuncionarioService {
     @Autowired
     private FuncionarioRepository funcionarioRepository;
 
-    public FuncionarioModel cadastrarFuncionario(FuncionarioModel funcionario){
+    public FuncionarioModel cadastrarFuncionario(FuncionarioModel funcionario) {
         return funcionarioRepository.save(funcionario);
     }
 
-    public FuncionarioModel listarFuncionario(FuncionarioModel funcionario){
-        return funcionarioRepository.findById(funcionario.getId()).get();
+    public FuncionarioModel listarFuncionario(FuncionarioModel funcionario) {
+        return funcionarioRepository.findById(funcionario.getId())
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionario.getId())
+                );
     }
 
-    public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario){
+    public FuncionarioModel atualizarFuncionario(FuncionarioModel funcionario) {
 
         FuncionarioModel existente = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() ->
-            new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionario.getId()));
+                new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionario.getId()));
 
         return funcionarioRepository.save(funcionario);
     }
 
-    public void deletarFuncionario(Integer id){
+    public void deletarFuncionario(Integer id) {
 
-        FuncionarioModel excluir = funcionarioRepository.findById(id).orElseThrow(() -> 
-            new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + id));
+        FuncionarioModel excluir = funcionarioRepository.findById(id).orElseThrow(() ->
+                new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + id));
 
         funcionarioRepository.deleteById(id);
+    }
+
+    public FuncionarioModel buscarPorId(Integer funcionarioId) {
+        return funcionarioRepository.findById(funcionarioId)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionarioId)
+                );
     }
 }
