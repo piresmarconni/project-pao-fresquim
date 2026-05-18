@@ -27,7 +27,7 @@ public class ClienteController {
         clienteService.deletarCliente(id);
     }
 
-    @GetMapping("/deletar/{id}")
+    @GetMapping("/validar-serasa/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Boolean status(@PathVariable Integer id){
         return clienteService.validarSerasa(id);
