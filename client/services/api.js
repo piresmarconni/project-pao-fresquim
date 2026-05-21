@@ -1,6 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3005",
+  baseURL: "https://perinephral-overfree-mable.ngrok-free.dev/",
+  headers: {
+    "ngrok-skip-browser-warning": "true",
+  },
 });
+
 export default api;
