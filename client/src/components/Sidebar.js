@@ -32,7 +32,7 @@ export default function Sidebar() {
 
       <div className="p-6 flex flex-col items-center">
         <Image
-          src="/Logo.png"
+          src="/logo.png"
           alt="Logo Pão FresQUIM"
           width={90}
           height={90}
