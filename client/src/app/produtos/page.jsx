@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Eye, Plus, Pencil, Trash2, Search, Loader2, Barcode } from "lucide-react";
 import api from "../../../services/api";
 import ModalProduto from "@/components/ModalProduto";
 import toast from "react-hot-toast";
@@ -14,6 +14,7 @@ export default function ProdutosPage() {
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     produtoEditando: null,
+    modoVisualizacao: false,
   });
 
   async function getProdutos(params) {
@@ -29,6 +30,7 @@ export default function ProdutosPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getProdutos();
   }, []);
 
@@ -52,7 +54,11 @@ export default function ProdutosPage() {
         toast.success("Produto criado com sucesso!");
       }
 
-      setModalConfig({ isOpen: false, produtoEditando: null });
+      setModalConfig({
+        isOpen: false,
+        produtoEditando: null,
+        modoVisualizacao: false,
+      });
       await getProdutos();
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
@@ -76,7 +82,11 @@ export default function ProdutosPage() {
         </div>
         <button
           onClick={() =>
-            setModalConfig({ isOpen: true, produtoEditando: null })
+            setModalConfig({
+              isOpen: true,
+              produtoEditando: null,
+              modoVisualizacao: false,
+            })
           }
           className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-100"
         >
@@ -141,7 +151,10 @@ export default function ProdutosPage() {
                   className="hover:bg-gray-50/50 transition-colors group"
                 >
                   <td className="px-6 py-4 font-bold text-gray-700">
-                    {prod.codigoBarras}
+                    <div className="flex items-center gap-2">
+                      <Barcode size={16} className="text-gray-400 shrink-0" />
+                      {prod.codigoBarras}
+                    </div>
                   </td>
                   <td className="px-6 py-4 font-bold text-gray-700">
                     {prod.nome}
@@ -156,10 +169,29 @@ export default function ProdutosPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button
+                        type="button"
+                        title="Visualizar produto"
+                        aria-label={`Visualizar ${prod.nome}`}
                         onClick={() =>
                           setModalConfig({
                             isOpen: true,
                             produtoEditando: prod,
+                            modoVisualizacao: true,
+                          })
+                        }
+                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Eye size={20} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Editar produto"
+                        aria-label={`Editar ${prod.nome}`}
+                        onClick={() =>
+                          setModalConfig({
+                            isOpen: true,
+                            produtoEditando: prod,
+                            modoVisualizacao: false,
                           })
                         }
                         className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
@@ -184,7 +216,14 @@ export default function ProdutosPage() {
       <ModalProduto
         isOpen={modalConfig.isOpen}
         produtoEditando={modalConfig.produtoEditando}
-        onClose={() => setModalConfig({ isOpen: false, produtoEditando: null })}
+        modoVisualizacao={modalConfig.modoVisualizacao}
+        onClose={() =>
+          setModalConfig({
+            isOpen: false,
+            produtoEditando: null,
+            modoVisualizacao: false,
+          })
+        }
         onSave={handleSaveProduto}
       />
     </div>

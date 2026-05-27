@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
+  Eye,
   Plus,
   Pencil,
   Trash2,
@@ -22,6 +23,7 @@ export default function ClientesPage() {
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     clienteEditando: null,
+    modoVisualizacao: false,
   });
 
   async function getClientes(params) {
@@ -37,6 +39,7 @@ export default function ClientesPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getClientes();
   }, []);
 
@@ -60,7 +63,11 @@ export default function ClientesPage() {
         toast.success("Novo cliente cadastrado!");
       }
 
-      setModalConfig({ isOpen: false, clienteEditando: null });
+      setModalConfig({
+        isOpen: false,
+        clienteEditando: null,
+        modoVisualizacao: false,
+      });
       await getClientes();
     } catch (error) {
       toast.error("Ocorreu um erro ao conectar com o servidor.");
@@ -82,7 +89,11 @@ export default function ClientesPage() {
         </div>
         <button
           onClick={() =>
-            setModalConfig({ isOpen: true, clienteEditando: null })
+            setModalConfig({
+              isOpen: true,
+              clienteEditando: null,
+              modoVisualizacao: false,
+            })
           }
           className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-100"
         >
@@ -175,10 +186,29 @@ export default function ClientesPage() {
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
                         <button
+                          type="button"
+                          title="Visualizar cliente"
+                          aria-label={`Visualizar ${cliente.nome}`}
                           onClick={() =>
                             setModalConfig({
                               isOpen: true,
                               clienteEditando: cliente,
+                              modoVisualizacao: true,
+                            })
+                          }
+                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button
+                          type="button"
+                          title="Editar cliente"
+                          aria-label={`Editar ${cliente.nome}`}
+                          onClick={() =>
+                            setModalConfig({
+                              isOpen: true,
+                              clienteEditando: cliente,
+                              modoVisualizacao: false,
                             })
                           }
                           className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
@@ -204,7 +234,14 @@ export default function ClientesPage() {
       <ModalCliente
         isOpen={modalConfig.isOpen}
         clienteEditando={modalConfig.clienteEditando}
-        onClose={() => setModalConfig({ isOpen: false, clienteEditando: null })}
+        modoVisualizacao={modalConfig.modoVisualizacao}
+        onClose={() =>
+          setModalConfig({
+            isOpen: false,
+            clienteEditando: null,
+            modoVisualizacao: false,
+          })
+        }
         onSave={handleSaveCliente}
       />
     </div>

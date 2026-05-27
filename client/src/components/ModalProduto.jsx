@@ -1,32 +1,44 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
 
+const ESTADO_INICIAL = {
+  nome: "",
+  categoria: "",
+  quantidade: "",
+  preco: "",
+  codigoBarras: "",
+};
+
 export default function ModalProduto({
   isOpen,
   onClose,
   produtoEditando,
+  modoVisualizacao = false,
   onSave,
 }) {
-  const estadoInicial = {
-    nome: "",
-    categoria: "",
-    quantidade: "",
-    preco: "",
-    codigoBarras: "",
-  };
-
-  const [formData, setFormData] = useState(estadoInicial);
+  const [formData, setFormData] = useState(ESTADO_INICIAL);
 
   useEffect(() => {
     if (produtoEditando) {
-      setFormData(produtoEditando);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData({
+        ...ESTADO_INICIAL,
+        ...produtoEditando,
+        nome: produtoEditando.nome || "",
+        categoria: produtoEditando.categoria || "",
+        quantidade: String(produtoEditando.quantidade ?? ""),
+        preco: String(produtoEditando.preco ?? ""),
+        codigoBarras: String(produtoEditando.codigoBarras || ""),
+      });
     } else {
-      setFormData(estadoInicial);
+      setFormData(ESTADO_INICIAL);
     }
   }, [produtoEditando, isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (modoVisualizacao) return;
+
     onSave({
       ...formData,
       quantidade: formData.quantidade !== "" ? parseInt(formData.quantidade, 10) : null,
@@ -34,13 +46,20 @@ export default function ModalProduto({
     });
   };
 
+  const tituloModal = modoVisualizacao
+    ? "Visualizar Produto"
+    : produtoEditando
+      ? "Editar Produto"
+      : "Cadastrar Novo Produto";
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={produtoEditando ? "Editar Produto" : "Cadastrar Novo Produto"}
+      title={tituloModal}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        <fieldset disabled={modoVisualizacao} className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
             Nome do Produto
@@ -128,12 +147,24 @@ export default function ModalProduto({
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg shadow-orange-100"
-        >
-          {produtoEditando ? "Salvar Alterações" : "Confirmar Cadastro"}
-        </button>
+        </fieldset>
+
+        {modoVisualizacao ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg"
+          >
+            Fechar
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg shadow-orange-100"
+          >
+            {produtoEditando ? "Salvar Alterações" : "Confirmar Cadastro"}
+          </button>
+        )}
       </form>
     </Modal>
   );

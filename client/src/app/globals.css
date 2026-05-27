@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@keyframes camera-drift-left {
+  0%,
+  100% {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: scale(1.08) translate3d(-10px, 6px, 0);
+  }
+}
+
+@keyframes camera-drift-right {
+  0%,
+  100% {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: scale(1.08) translate3d(10px, -6px, 0);
+  }
+}
+
+@keyframes camera-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  20%,
+  70% {
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.camera-feed {
+  animation-duration: 11s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.camera-feed-left {
+  animation-name: camera-drift-left;
+}
+
+.camera-feed-right {
+  animation-name: camera-drift-right;
+}
+
+.camera-scan {
+  animation: camera-scan 4s linear infinite;
+}

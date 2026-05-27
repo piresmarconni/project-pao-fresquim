@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Eye, Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 import api from "../../../services/api";
 import ModalFuncionario from "@/components/ModalFuncionario";
 import toast from "react-hot-toast";
+
+const formatarData = (data) => {
+  if (!data) return "Nao informada";
+  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+};
 
 export default function FuncionariosPage() {
   const [busca, setBusca] = useState("");
@@ -14,6 +19,7 @@ export default function FuncionariosPage() {
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     funcionarioEditando: null,
+    modoVisualizacao: false,
   });
 
   async function getFuncionarios(params) {
@@ -35,6 +41,7 @@ export default function FuncionariosPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getFuncionarios();
   }, []);
 
@@ -54,17 +61,20 @@ export default function FuncionariosPage() {
   const handleSaveFuncionario = async (dadosDoFormulario) => {
     try {
 
-      dadosDoFormulario.salario = Number(
-        dadosDoFormulario.salario
+      const dadosFuncionario = {
+        ...dadosDoFormulario,
+        salario: Number(
+          String(dadosDoFormulario.salario)
           .replace(/\./g, "")
           .replace(",", ".")
-      );
+        ),
+      };
 
-      if (dadosDoFormulario.id) {
+      if (dadosFuncionario.id) {
 
         await api.put(
-          `/funcionarios/${dadosDoFormulario.id}`,
-          dadosDoFormulario
+          `/funcionarios/${dadosFuncionario.id}`,
+          dadosFuncionario
         );
 
         toast.success("Dados atualizados com sucesso!");
@@ -73,7 +83,7 @@ export default function FuncionariosPage() {
 
         await api.post(
           "/funcionarios/cadastrar",
-          dadosDoFormulario
+          dadosFuncionario
         );
 
         toast.success("Novo funcionário cadastrado!");
@@ -82,6 +92,7 @@ export default function FuncionariosPage() {
       setModalConfig({
         isOpen: false,
         funcionarioEditando: null,
+        modoVisualizacao: false,
       });
 
       await getFuncionarios();
@@ -119,6 +130,7 @@ export default function FuncionariosPage() {
             setModalConfig({
               isOpen: true,
               funcionarioEditando: null,
+              modoVisualizacao: false,
             })
           }
           className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg"
@@ -156,6 +168,9 @@ export default function FuncionariosPage() {
                 <th className="px-6 py-4">Nome</th>
                 <th className="px-6 py-4 text-center">Cargo</th>
                 <th className="px-6 py-4">Telefone</th>
+                <th className="px-6 py-4">Admissao</th>
+                <th className="px-6 py-4">Emergencia</th>
+                <th className="px-6 py-4 text-center">Licencas</th>
                 <th className="px-6 py-4">Salário</th>
                 <th className="px-6 py-4 text-center">Status</th>
                 <th className="px-6 py-4 text-right">Ações</th>
@@ -167,7 +182,7 @@ export default function FuncionariosPage() {
               {isLoading ? (
 
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center">
+                  <td colSpan="9" className="px-6 py-12 text-center">
 
                     <div className="flex flex-col items-center justify-center text-orange-500">
                       <Loader2
@@ -187,7 +202,7 @@ export default function FuncionariosPage() {
 
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="9"
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     Nenhum funcionário encontrado.
@@ -219,6 +234,25 @@ export default function FuncionariosPage() {
                       {func.telefone || "Não informado"}
                     </td>
 
+                    <td className="px-6 py-4 text-gray-500">
+                      {formatarData(func.dataAdmissao)}
+                    </td>
+
+                    <td className="px-6 py-4 text-gray-500">
+                      <p className="font-medium text-gray-700">
+                        {func.contatoEmergenciaNome || "Nao informado"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {func.contatoEmergenciaTelefone || ""}
+                      </p>
+                    </td>
+
+                    <td className="px-6 py-4 text-center">
+                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-gray-100 text-gray-600">
+                        {func.licencas?.length || 0}
+                      </span>
+                    </td>
+
                     <td className="px-6 py-4 font-bold">
                       {func.salario != null
                         ? `R$ ${func.salario}`
@@ -243,10 +277,30 @@ export default function FuncionariosPage() {
                       <div className="flex justify-end gap-2">
 
                         <button
+                          type="button"
+                          title="Visualizar funcionário"
+                          aria-label={`Visualizar ${func.nome}`}
                           onClick={() =>
                             setModalConfig({
                               isOpen: true,
                               funcionarioEditando: func,
+                              modoVisualizacao: true,
+                            })
+                          }
+                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Eye size={18} />
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Editar funcionário"
+                          aria-label={`Editar ${func.nome}`}
+                          onClick={() =>
+                            setModalConfig({
+                              isOpen: true,
+                              funcionarioEditando: func,
+                              modoVisualizacao: false,
                             })
                           }
                           className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
@@ -277,10 +331,12 @@ export default function FuncionariosPage() {
       <ModalFuncionario
         isOpen={modalConfig.isOpen}
         funcionarioEditando={modalConfig.funcionarioEditando}
+        modoVisualizacao={modalConfig.modoVisualizacao}
         onClose={() =>
           setModalConfig({
             isOpen: false,
             funcionarioEditando: null,
+            modoVisualizacao: false,
           })
         }
         onSave={handleSaveFuncionario}

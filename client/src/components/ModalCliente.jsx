@@ -3,32 +3,43 @@ import Modal from "./Modal";
 import { IMaskInput } from "react-imask";
 import toast from "react-hot-toast";
 
+const ESTADO_INICIAL = {
+  nome: "",
+  email: "",
+  cpf: "",
+  telefone: "",
+  bloqueado: false,
+};
+
 export default function ModalCliente({
   isOpen,
   onClose,
   clienteEditando,
+  modoVisualizacao = false,
   onSave,
 }) {
-  const estadoInicial = {
-    nome: "",
-    email: "",
-    cpf: "",
-    telefone: "",
-    bloqueado: false,
-  };
-
-  const [formData, setFormData] = useState(estadoInicial);
+  const [formData, setFormData] = useState(ESTADO_INICIAL);
 
   useEffect(() => {
     if (clienteEditando) {
-      setFormData(clienteEditando);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData({
+        ...ESTADO_INICIAL,
+        ...clienteEditando,
+        nome: clienteEditando.nome || "",
+        email: clienteEditando.email || "",
+        cpf: String(clienteEditando.cpf || ""),
+        telefone: String(clienteEditando.telefone || ""),
+        bloqueado: Boolean(clienteEditando.bloqueado),
+      });
     } else {
-      setFormData(estadoInicial);
+      setFormData(ESTADO_INICIAL);
     }
   }, [clienteEditando, isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (modoVisualizacao) return;
 
     const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!regexEmail.test(formData.email)) {
@@ -45,13 +56,20 @@ export default function ModalCliente({
     onSave({ ...formData, cpf: cpfSomenteNumeros });
   };
 
+  const tituloModal = modoVisualizacao
+    ? "Visualizar Cliente"
+    : clienteEditando
+      ? "Editar Cadastro"
+      : "Novo Cliente";
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={clienteEditando ? "Editar Cadastro" : "Novo Cliente"}
+      title={tituloModal}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        <fieldset disabled={modoVisualizacao} className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
             Nome Completo
@@ -133,13 +151,24 @@ export default function ModalCliente({
             <option value="true">Negativado</option>
           </select>
         </div>
+        </fieldset>
 
-        <button
-          type="submit"
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg"
-        >
-          {clienteEditando ? "Atualizar Cliente" : "Salvar Cliente"}
-        </button>
+        {modoVisualizacao ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg"
+          >
+            Fechar
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-2xl mt-4 transition-all shadow-lg"
+          >
+            {clienteEditando ? "Atualizar Cliente" : "Salvar Cliente"}
+          </button>
+        )}
       </form>
     </Modal>
   );

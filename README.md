@@ -125,8 +125,8 @@ Aguarde a mensagem indicando que a aplicação iniciou.
 
 ### Endpoints
 
-- Backend: http://localhost:8081
-- Swagger: http://localhost:8081/swagger-ui/index.html
+- Backend: http://localhost:8080
+- Swagger: http://localhost:8080/swagger-ui/index.html
 
 ---
 
@@ -196,7 +196,7 @@ project-pao-fresquim/
 | `mvn` não reconhecido | Maven não instalado ou não configurado no PATH |
 | `npm` não reconhecido | Node.js não instalado |
 | `FATAL: Tenant or user not found` | O arquivo `.env` não foi criado corretamente ou as credenciais estão incorretas |
-| Backend falha ao iniciar | Verifique se a porta `8081` já está em uso |
+| Backend falha ao iniciar | Verifique se a porta `8080` já está em uso |
 | `lock file out of sync` | Execute `npm install` novamente na pasta `client/` |
 
 ---
