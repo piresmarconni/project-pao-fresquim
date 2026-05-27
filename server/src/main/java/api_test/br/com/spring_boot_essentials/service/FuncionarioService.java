@@ -19,6 +19,7 @@ public class FuncionarioService {
     }
 
     public FuncionarioModel cadastrarFuncionario(FuncionarioModel funcionario) {
+        vincularLicencas(funcionario);
         return funcionarioRepository.save(funcionario);
     }
 
@@ -31,6 +32,7 @@ public class FuncionarioService {
         funcionarioRepository.findById(funcionario.getId()).orElseThrow(() ->
                 new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + funcionario.getId()));
 
+        vincularLicencas(funcionario);
         return funcionarioRepository.save(funcionario);
     }
 
@@ -39,5 +41,12 @@ public class FuncionarioService {
                 new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + id));
 
         funcionarioRepository.deleteById(id);
+    }
+    private void vincularLicencas(FuncionarioModel funcionario) {
+        if (funcionario.getLicencas() == null) {
+            return;
+        }
+
+        funcionario.getLicencas().forEach(licenca -> licenca.setFuncionario(funcionario));
     }
 }

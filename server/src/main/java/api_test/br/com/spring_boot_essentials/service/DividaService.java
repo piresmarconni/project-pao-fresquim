@@ -5,6 +5,7 @@ import api_test.br.com.spring_boot_essentials.repository.DividaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -34,6 +35,13 @@ public class DividaService {
     public void deletar(Integer id) {
         DividaModel divida = buscarPorId(id);
         dividaRepository.delete(divida);
+    }
+
+    public DividaModel marcarComoPaga(Integer id) {
+        DividaModel divida = buscarPorId(id);
+        divida.setPaga(Boolean.TRUE);
+        divida.setDataPagamento(LocalDate.now());
+        return dividaRepository.save(divida);
     }
 
     public DividaModel registrarDivida(DividaModel novaDivida) {

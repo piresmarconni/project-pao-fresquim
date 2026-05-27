@@ -1,6 +1,5 @@
 package api_test.br.com.spring_boot_essentials.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -35,11 +34,13 @@ public class VendaModel {
     @JoinTable(name = "venda_id", joinColumns = @JoinColumn(name = "venda_id"), inverseJoinColumns = @JoinColumn(name = "produto_id"))
     private List<ProdutoModel> produtos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VendaItemModel> itens = new ArrayList<>();
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "pagamento_id", referencedColumnName = "id")
     private PagamentoModel pagamento;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private ClienteModel cliente;

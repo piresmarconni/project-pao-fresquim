@@ -24,7 +24,10 @@ public class PontoModel {
     @Column(nullable = false)
     private LocalTime horaEntrada;
 
-    @Column(nullable = false)
+    private LocalTime horaSaidaAlmoco;
+
+    private LocalTime horaVoltaAlmoco;
+
     private LocalTime horaSaida;
 
     @JsonIgnore

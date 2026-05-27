@@ -38,6 +38,11 @@ public class DividaController {
         return ResponseEntity.ok(dividaService.atualizar(id, divida));
     }
 
+    @PatchMapping("/{id}/pagar")
+    public ResponseEntity<DividaModel> marcarComoPaga(@PathVariable Integer id) {
+        return ResponseEntity.ok(dividaService.marcarComoPaga(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         dividaService.deletar(id);

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,16 @@ public class FuncionarioModel {
     @NotBlank(message = "Cargo é obrigatório")
     private String cargo;
 
+    @Size(min = 11, max = 11, message = "CPF deve ter exatamente 11 dÃ­gitos")
+    private String cpf;
+
     private String telefone;
+
+    private LocalDate dataAdmissao;
+
+    private String contatoEmergenciaNome;
+
+    private String contatoEmergenciaTelefone;
 
     private Double salario;
 
@@ -39,6 +49,9 @@ public class FuncionarioModel {
 
     @Embedded
     private EnderecoModel endereco;
+
+    @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LicencaModel> licencas = new ArrayList<>();
 
     public FuncionarioModel(Integer id, String nome, String cargo) {
         this.id = id;

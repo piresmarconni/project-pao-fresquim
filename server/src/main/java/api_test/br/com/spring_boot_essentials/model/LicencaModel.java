@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,10 +23,17 @@ public class LicencaModel {
     private String tipoLicenca;
 
     @Column(name="dataInicio")
-    private Date dataInicio;
+    private LocalDate dataInicio;
 
     @Column(name="dataFim")
-    private Date dataFim;
+    private LocalDate dataFim;
+
+    private String observacao;
+
+    @Column(columnDefinition = "TEXT")
+    private String arquivoAtestado;
+
+    private String nomeArquivoAtestado;
 
     @JsonIgnore
     @ManyToOne()

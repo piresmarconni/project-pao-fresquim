@@ -1,5 +1,6 @@
 package api_test.br.com.spring_boot_essentials.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,8 @@ public class NotificacaoModel {
     @Column(name = "status_entrega")
     private boolean statusEntrega;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="id_divida")
+    @JsonIgnore
     private DividaModel divida;
 }
